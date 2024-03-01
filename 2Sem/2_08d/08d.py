@@ -29,8 +29,7 @@ for file in files:
     Axes.set(xlim=(0, 2.8), ylim=(80, 720))
     Axes.xaxis.set_major_locator(MaxNLocator(plot_width))
     Axes.yaxis.set_major_locator(MaxNLocator(plot_height))
-#    Axes.set_xticks([0, 2.8, 0.1])
-#    Axes.set_yticks([75, 725, 25]
+
     Axes.xaxis.set_minor_locator(LinearLocator(plot_width*10))
     Axes.yaxis.set_minor_locator(LinearLocator(plot_height*10))
 
@@ -44,15 +43,10 @@ for file in files:
 
     plot.plot(xaxis, yaxis, 'o', markerfacecolor='k', color='w')
 
-#    plot.grid(color='c')
-
     xlinspaced = np.linspace(min(xaxis), max(xaxis), 2800)
     yinterpolated = np.interp(xlinspaced, xaxis, yaxis)
 
     plot.plot(xlinspaced, yinterpolated, color='k', alpha=0.5)
-#    plot.plot(xaxis, yaxis, color='r', alpha=0.5)
-
-
     File.close()
 
 
