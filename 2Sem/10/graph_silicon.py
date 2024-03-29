@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator, LinearLocator
 
-
 def pair_point_method(x_list, y_list):
     angle = 0
     pairs = int(len(x_list)/2)
