@@ -72,6 +72,7 @@ if __name__ == "__main__":
     plt.scatter(t, one_by_ε, color="black", s=10)
     #plt.plot(t, one_by_ε, color="black")
     plt.show()
+    plt.savefig("graph.png")
 
     output_file = open("output.csv", "w")
     output_file.write("| t, ℃  | C, нФ |  ε, 1/мм  | 1/ε, мм  |\n")
