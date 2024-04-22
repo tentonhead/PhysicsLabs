@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plot
+import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator, LinearLocator
 
 
@@ -21,7 +21,7 @@ for file in files:
         xaxis.append(float(row[0]))
         yaxis.append(float(row[1]))
 
-    Figure, Axes = plot.subplots()
+    Figure, Axes = plt.subplots()
     Figure.set_size_inches(plot_width/inch, plot_height/inch)
 
     Axes.minorticks_on()
@@ -39,15 +39,15 @@ for file in files:
     title_start = "Рис."+str(i)+" График зависимости "
     title_end = " При "+ r'$U_a$ = '+ files[i-1][0] + "B"
     Axes.set_title(title_start + r'$I_a (I_L)$'+title_end)
-    i+=1
 
-    plot.plot(xaxis, yaxis, 'o', markerfacecolor='k', color='w')
+    plt.plot(xaxis, yaxis, 'o', markerfacecolor='k', color='w')
 
     xlinspaced = np.linspace(min(xaxis), max(xaxis), 2800)
     yinterpolated = np.interp(xlinspaced, xaxis, yaxis)
 
-    plot.plot(xlinspaced, yinterpolated, color='k', alpha=0.5)
+    plt.plot(xlinspaced, yinterpolated, color='k', alpha=0.5)
     File.close()
+    plt.savefig("graph{}.png".format(i))
+    i+=1
 
-
-plot.show()
+plt.show()

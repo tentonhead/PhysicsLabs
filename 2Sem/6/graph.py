@@ -94,6 +94,7 @@ if __name__ == "__main__":
             clip_on=False)
 
     plt.scatter(H, B, color="black", s=10)
+    plt.savefig("graph_BH.pdf", format="pdf")
 
 
     μ = (1 / μ0) * (B/H)
@@ -107,7 +108,7 @@ if __name__ == "__main__":
     Ax2.xaxis.set_minor_locator(LinearLocator(int(xmax-xmin)*5))
     Ax2.yaxis.set_major_locator(MultipleLocator(1000))
     Ax2.yaxis.set_minor_locator(LinearLocator(int((ymax-ymin)/100)))
-    Ax2.text(xmin-1.5, ymax+500, "μ")#Тл")
+    Ax2.text(xmin-1.5, ymax+500, "μ")
     Ax2.text(xmax+1, ymin-400, "H, A/м")
     Ax2.set(xlim=(xmin, xmax), ylim=(ymin, ymax))
     Ax2.set(title= r'График 2: $\mu(H)$ - изменения магитной проницаемости')
@@ -122,8 +123,6 @@ if __name__ == "__main__":
 
     plt.scatter(H, μ, color="black", s=10)
 
-    #plt.plot(t, one_by_ε, color="black")
-    plt.savefig("graph_BH.pdf", format="pdf")
     plt.savefig("graph_MuH.pdf", format="pdf")
     plt.show()
 
