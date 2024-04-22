@@ -123,4 +123,5 @@ if __name__ == "__main__":
     plt.plot(xf_tan+idiots_coefficient, yf_tan, color="black", linestyle="--")
     plt.plot(xr_tan, yr_tan, color="black", linestyle="--")
 
+    plt.savefig("graphSi.png")
     plt.show()

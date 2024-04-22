@@ -143,4 +143,5 @@ if __name__ == "__main__":
     yrt_tan = xrt_tan * angle_reverse#+ idiots_theory_coefficient
     #plt.plot(xrt_tan-0.2, yrt_tan+dtc, color="red", linestyle="--")
 
+    plt.savefig("graphGe.png")
     plt.show()
