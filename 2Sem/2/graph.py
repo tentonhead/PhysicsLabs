@@ -1,4 +1,3 @@
-from re import X
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator, LinearLocator
@@ -10,13 +9,33 @@ def get_data (file, x, y, z):
         y.append(float(line[2]))
         z.append(float(line[3]))
 
-def pair_point_method(x_list, y_list):
-    angle = 0
+def pair_point_method(x_list, y_list, k, filename):
+    file = open(filename, 'w')
+    file.write("Y, X, alpha\n")
+    sum = 0
     pairs = int(len(x_list)/2)
     for i in range(pairs):
-        angle += ((y_list[i+pairs] - y_list[i]))\
-            / (x_list[i+pairs] - x_list[i])
-    return angle / pairs
+        y = y_list[i+pairs] - y_list[i]
+        x = x_list[i+pairs] - x_list[i]
+        angle = k * (y/x) 
+        sum += angle
+        file.write("{}, {}, {}\n".format(y, x, angle))
+    avg = sum/pairs
+    file.write("The average is {}\n".format(avg))
+
+    file.write("alpha-<alpha>, (alpha-<alpha>)^2\n")
+    print("AAAAAA")
+    for i in range(pairs):
+        y = y_list[i+pairs] - y_list[i]
+        x = x_list[i+pairs] - x_list[i]
+        angle = round(k * (y/x), 6) 
+        dif = angle - round(avg, 6) 
+        dif2 = dif * dif
+        print(angle, dif, dif2)
+
+        file.write("{}, {}\n".format(dif, dif2))
+    file.close()
+    return avg
 
 def add_spaces_to_sides(string, num_before_dot, num_after_dot):
     left_len = len(string.split('.')[0]) 
@@ -38,10 +57,6 @@ def calc_parabola_vertex(x1, y1, x2, y2, x3, y3):
 fig_width = 8.3; fig_height = 11.7 # Size of A4 paper in inches
 file = "data.csv"
 
-l = 1.00 #mm
-h = 1.00 #mm
-d =  7.00 * 10**3 #mm
-
 if __name__ == "__main__":
     data = open(file, "r")
     t  = []
@@ -52,31 +67,32 @@ if __name__ == "__main__":
     Rm = np.array(Rm)
     Rs = np.array(Rs)
 
-    print("Table 1")
+    print("Table 1\n", 11*'-')
     for i in range(len(t)):
         print(t[i], Rm[i], Rs[i])
+    print(11*'-')
 
     T = t + 273.15
     one_by_T = 1/T
     lnRs = np.emath.log(Rs)
+
+    print("T min, max:", min(T), max(T))
+    print("Rm min, max:", min(Rm), max(Rm))
+    print("ln(Rs) min, max:", min(lnRs), max(lnRs))
+    print(11*'-')
+
     Fig = plt.figure(figsize=(fig_width, fig_height))
     Ax1 = plt.subplot(211)
 
     # Set them manualy
+    conv = 1000 # from kOms to Oms
     xstep = 5.0
-    ystep = 0.01
-    xmin = 295.0; xmax = 340.0
-    ymin = 1.12; ymax = 1.30
-    xmult = 2; ymult = 1000
+    ystep = 0.02*conv
+    xmin = 270.0; xmax = 340.0
+    ymin = 1.00*conv; ymax = 1.30*conv
+    xmult = 2; ymult = 1000/conv
 
-    Xlabels = [""]
-    for i in range(int(xmin)*10, int(xmax)*10+1, int(xstep)*5):
-        if i % 10 == 0:
-            Xlabels.append(str(int(i/10)))
-        else:
-            Xlabels.append("")
-
-    Ax1.xaxis.set_major_locator(MultipleLocator(xstep/2))
+    Ax1.xaxis.set_major_locator(MultipleLocator(xstep))
     Ax1.xaxis.set_minor_locator(LinearLocator(int((xmax-xmin)*xmult)))
     Ax1.yaxis.set_major_locator(MultipleLocator(ystep))
     Ax1.yaxis.set_minor_locator(LinearLocator(int((ymax-ymin)*ymult)))
@@ -94,16 +110,46 @@ if __name__ == "__main__":
     Ax1.plot(xmin, 1+0.0075, "^k", transform=Ax1.get_xaxis_transform(),
             clip_on=False)
 
-    Ax1.set_xticklabels(Xlabels)
 
     #plt.plot   (T, Rm, color="black")
+    tzero_x = 2 * [273.15]
+    tzero_y = [i for i in range(1000, 1080, 40)]
+    plt.plot(tzero_x, tzero_y, "--", color="black", lw=1)
+
+    Rm = Rm*conv
+    print(Rm)
+    print("Pairs for calculating the angle")
+    xpair = [T[1], T[3]]+list(T[6:])
+    ypair = [Rm[1], Rm[3]]+list(Rm[6:])
+    for i in range(len(xpair)):
+        print(i+1, xpair[i], ypair[i])
+    print(11*'-')
+
+    R0 = 1033
+
+    alpha = pair_point_method(xpair, ypair, 1/R0, "pair_point1.csv")
+    print("The avg angle is", alpha)
+
+    print(10*'-')
+    mid = 0
+    for i in range(len(xpair)):
+        ans = ypair[i] - alpha*xpair[i]
+        print(ans)
+        mid += ans
+    mid = mid/len(xpair)
+    print("MID =", mid)
+    print(10*'-')
+
+    x = np.array([i for i in range(int(xmin), int(xmax), 5)])
+    plt.plot(x, alpha*x+mid, 'k--')
+
     plt.scatter(T, Rm, color="black", s=10)
 
     Ax2 = plt.subplot(212)
     xstep = 0.00005
     ystep = 0.2
     xmin = 0.00295; xmax = 0.00340
-    ymin = 0.0; ymax = 2.0
+    ymin = 0.0; ymax = 1.8
     xmult = 200000; ymult = 50
 
     Ax2.xaxis.set_major_locator(MultipleLocator(xstep))
@@ -112,7 +158,7 @@ if __name__ == "__main__":
     Ax2.yaxis.set_minor_locator(LinearLocator(int((ymax-ymin)*ymult)))
 
     Ax2.text(xmin-0.000025, ymax+0.1, r'$ln(R_s)$')
-    Ax2.text(xmax+0.000001, ymin-0.2, r'1/T')
+    Ax2.text(xmax+0.000001, ymin-0.2, r'1000/T')
     Ax2.set(xlim=(xmin, xmax), ylim=(ymin, ymax),
             title= r'График 2: зависимость $ln(R_s)$ от f = 1/T')
 
@@ -124,7 +170,15 @@ if __name__ == "__main__":
     Ax2.plot(xmin, 1+0.0075, "^k", transform=Ax2.get_xaxis_transform(),
             clip_on=False)
 
-    #Ax2.set_xticklabels(Xlabels)
+    gamma = pair_point_method(one_by_T, lnRs, 1,"pair_point2.csv")
+
+    X2labels = [""]
+    for i in range(int(xmin*100_000), int(xmax*100_000)+int(xstep*100_000),
+                   int(xstep*100_000)):
+        #print(i)
+        X2labels.append(str(i))
+    Ax2.set_xticklabels(X2labels)
+
     plt.scatter(one_by_T, lnRs, color="black", s=10)
     #plt.savefig("graph1and2.png")
     plt.show()
